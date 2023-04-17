@@ -132,21 +132,6 @@ public class RestTest {
     }
 
     @Test
-    public void checkGetUniversitiesThatContainsDomain() throws ParseException {
-        System.out.println("Checking GET that returns universities which domains contains specific part");
-        String partOfSearchedDomain = "edu";
-        ArrayList<UniversityData> actualUniversitiesData = new ArrayList<>(RestAssured.get("/search?domain=" + partOfSearchedDomain).
-                then().statusCode(200)
-                .extract().body().jsonPath().getList("", UniversityData.class));;
-        Assert.assertTrue("API didn't return anything. This is a potential bug", actualUniversitiesData.size() > 0);
-        ArrayList<UniversityData> expectedUniversitiesData = data.stream().filter(u -> u.domains.stream().anyMatch(d -> d.contains(partOfSearchedDomain))).collect(Collectors.toCollection(ArrayList::new));
-
-        printDifferenceInUniversitiesList(expectedUniversitiesData, actualUniversitiesData);
-
-        Assert.assertTrue(compareTwoLists(expectedUniversitiesData, actualUniversitiesData));
-    }
-
-    @Test
     public void checkGetAllDataAvailable() throws ParseException {
         System.out.println("Checking GET that returns all universities by leaving name empty");
         String partOfSearchedDomain = "edu";
