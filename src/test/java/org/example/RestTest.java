@@ -36,7 +36,7 @@ public class RestTest {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        data = gson.fromJson(remoteData, UNIVERSITY_DATA_TYPE); // contains the whole reviews list
+        data = gson.fromJson(remoteData, UNIVERSITY_DATA_TYPE);
     }
 
     private void printDifferenceInUniversitiesList(ArrayList<UniversityData> expectedDataList, ArrayList<UniversityData> actualDataList) {
@@ -126,6 +126,8 @@ public class RestTest {
                 .extract().body().jsonPath().getList("", UniversityData.class));;
         Assert.assertTrue("API didn't return anything. Considering it as a bug", actualUniversitiesData.size() > 0);
         UniversityData actualUniversityData = actualUniversitiesData.get(0);
+        Assert.assertNotNull(actualUniversityData.name);
+        Assert.assertNotNull(actualUniversityData.country);
         printDifferenceInUniversitiesList(expectedUniversitiesData, actualUniversitiesData);
 
         Assert.assertTrue(compareTwoLists(expectedUniversitiesData, actualUniversitiesData));
@@ -134,7 +136,6 @@ public class RestTest {
     @Test
     public void checkGetAllDataAvailable() throws ParseException {
         System.out.println("Checking GET that returns all universities by leaving name empty");
-        String partOfSearchedDomain = "edu";
         ArrayList<UniversityData> actualUniversitiesDataList = new ArrayList<>(RestAssured.get("/search?name=").
                 then().statusCode(200)
                 .extract().body().jsonPath().getList("", UniversityData.class));
@@ -145,8 +146,6 @@ public class RestTest {
 
         Assert.assertTrue(compareTwoLists(expectedUniversitiesDataList, actualUniversitiesDataList));
     }
-
-
 
     public boolean compareTwoLists(List<UniversityData> expectedUniversitiesDataList, List<UniversityData> actualUniversitiesDataList){
         return expectedUniversitiesDataList.containsAll(actualUniversitiesDataList) && actualUniversitiesDataList.containsAll(expectedUniversitiesDataList);
