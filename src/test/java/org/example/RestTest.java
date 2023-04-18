@@ -2,6 +2,7 @@ package org.example;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.google.gson.stream.JsonReader;
 import io.restassured.RestAssured;
 import org.apache.commons.io.IOUtils;
 import org.json.simple.parser.ParseException;
@@ -9,8 +10,8 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.lang.reflect.Type;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -27,16 +28,15 @@ public class RestTest {
     @BeforeClass
     public static void init() {
         RestAssured.baseURI = "http://universities.hipolabs.com/";
+        String filename = Thread.currentThread().getContextClassLoader().getResource("world_universities_and_domains.json").getFile();
         Gson gson = new Gson();
-        String url = "https://github.com/Hipo/university-domains-list/blob/master/world_universities_and_domains.json?raw=true";
-        String remoteData;
-        try (InputStream inputStream = new URL(url).openStream()) {
-            remoteData = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
-
-        } catch (IOException e) {
+        JsonReader reader = null;
+        try {
+            reader = new JsonReader(new FileReader(filename));
+        } catch (FileNotFoundException e) {
             throw new RuntimeException(e);
         }
-        data = gson.fromJson(remoteData, UNIVERSITY_DATA_TYPE);
+        data = gson.fromJson(reader, UNIVERSITY_DATA_TYPE); // contains the whole reviews list
     }
 
     private void printDifferenceInUniversitiesList(ArrayList<UniversityData> expectedDataList, ArrayList<UniversityData> actualDataList) {
